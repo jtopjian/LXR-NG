@@ -65,3 +65,6 @@ front/AVR/Release/
 *.res
 *.dep
 *.htm
+
+# vim
+*.swp

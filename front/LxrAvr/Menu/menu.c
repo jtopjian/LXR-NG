@@ -437,7 +437,7 @@ const enum Datatypes PROGMEM parameter_dtypes[NUM_PARAMS] = {
 	    /*PAR_MORPH*/ 			DTYPE_0B255,
 	    /*PAR_ACTIVE_STEP */ 	DTYPE_0B127,							//230
 	    /*PAR_STEP_VOLUME*/ 	DTYPE_0B127,
-	    /*PAR_STEP_PROB*/ 		DTYPE_0B127,
+	    /*PAR_STEP_PROB*/ 		DTYPE_1B16,
 	    /*PAR_STEP_NOTE*/ 		DTYPE_NOTE_NAME,
 	    /*PAR_EUKLID_LENGTH*/ 	DTYPE_1B16,
 	    /*PAR_EUKLID_STEPS*/ 	DTYPE_1B16,
@@ -540,7 +540,7 @@ void lockPotentiometerFetch()
 	{
 		//all 4 parameters locked
 		parameterFetch |= 0x0F;
-	}	
+	}
 }
 
 //-----------------------------------------------------------------
@@ -606,7 +606,7 @@ void sendDisplayBuffer()
 				lcd_data(editDisplayBuffer[i][j]);
 				//update currentDisplayBuffer
 				currentDisplayBuffer[i][j] = editDisplayBuffer[i][j];
-			}	
+			}
 		}
 
 	}
@@ -622,11 +622,11 @@ void menu_repaintAll()
 
 	//if(copyClear_Mode == MODE_NONE)
 	{
-		memset(editDisplayBuffer,' ',2*17);	
+		memset(editDisplayBuffer,' ',2*17);
 		memset(currentDisplayBuffer,127,2*16);
 
 		menu_repaint();
-	}		
+	}
 }
 
 //-----------------------------------------------------------------
@@ -687,10 +687,10 @@ static void menu_repaintLoadSavePage()
 		{
 			// if we are editing the name
 			if( (menu_saveOptions.state >= SAVE_STATE_EDIT_NAME1) && (menu_saveOptions.state <= SAVE_STATE_EDIT_NAME8) )
-			{			
+			{
 				if(editModeActive) { // draw a box around active character (encoder changes value)
 					editDisplayBuffer[1][4+menu_saveOptions.state-SAVE_STATE_EDIT_NAME1]='[';
-					editDisplayBuffer[1][6+menu_saveOptions.state-SAVE_STATE_EDIT_NAME1]=']';	
+					editDisplayBuffer[1][6+menu_saveOptions.state-SAVE_STATE_EDIT_NAME1]=']';
 				} else { // using encoder to move left and right, using knob to change letter
 					//underline under current char
 					visibleCursor =(uint8_t)( VIS_CURS(1,5+menu_saveOptions.state-SAVE_STATE_EDIT_NAME1,1));
@@ -702,11 +702,11 @@ static void menu_repaintLoadSavePage()
 		memcpy_P(&editDisplayBuffer[1][14],menuText_ok,2);
 		if((menu_saveOptions.state==SAVE_STATE_OK) ||
 				(menu_saveOptions.what >= SAVE_TYPE_GLO && menu_saveOptions.state > SAVE_STATE_EDIT_TYPE))
-		{	
+		{
 			//arrow before parameter
 			editDisplayBuffer[1][13]= ARROW_SIGN;
 			//visibleCursor = VIS_CURS(1,14,1);
-		}	
+		}
 	} else { // bottom row - Load page is active
 		//ok button shown for loading everything except kit and morph - which are loaded instantaneously
 		if(menu_saveOptions.what != SAVE_TYPE_KIT && menu_saveOptions.what != SAVE_TYPE_MORPH) {
@@ -717,12 +717,12 @@ static void menu_repaintLoadSavePage()
 				//arrow before parameter
 				editDisplayBuffer[1][13]= ARROW_SIGN;
 				//visibleCursor = VIS_CURS(1,14,1);
-			}	
+			}
 		} else { //clear ok text
 			editDisplayBuffer[1][14] = 0;
 			editDisplayBuffer[1][15] = 0;
-		}			
-	}	
+		}
+	}
 }
 //-----------------------------------------------------------------
 static uint8_t has2ndPage(uint8_t menuPage)
@@ -732,7 +732,7 @@ static uint8_t has2ndPage(uint8_t menuPage)
 	{
 		return 1;
 	}
-	else return 0;	
+	else return 0;
 
 }
 //-----------------------------------------------------------------
@@ -1088,7 +1088,7 @@ void menu_handleSaveScreenKnobValue(uint8_t potNr, uint8_t value)
 
 			//force complete repaint
 			menu_repaintAll();
-		}			
+		}
 	}
 	else if(menu_saveOptions.state >=SAVE_STATE_EDIT_NAME1 && menu_saveOptions.state <=SAVE_STATE_EDIT_NAME8)
 	{
@@ -1135,7 +1135,7 @@ void menu_handleSaveScreenKnobValue(uint8_t potNr, uint8_t value)
 		default://switch(potNr)
 			break;
 		} //switch(potNr)
-	}		
+	}
 
 }
 //-----------------------------------------------------------------
@@ -1178,11 +1178,11 @@ void menu_handleLoadSaveMenu(int8_t inc, uint8_t btnClicked)
 					preset_saveAll(menu_currentPresetNr[SAVE_TYPE_ALL],1);
 					break;
 				}
-				menu_resetSaveParameters();						
+				menu_resetSaveParameters();
 
 			} else { //menu_activePage != SAVE_PAGE
 
-				//load page 
+				//load page
 				switch(menu_saveOptions.what) {
 				case SAVE_TYPE_PATTERN:
 					if(preset_loadPattern(menu_currentPresetNr[SAVE_TYPE_PATTERN]))
@@ -1201,7 +1201,7 @@ void menu_handleLoadSaveMenu(int8_t inc, uint8_t btnClicked)
 
 				case SAVE_TYPE_GLO:
 					preset_loadGlobals();
-					menu_resetSaveParameters();						
+					menu_resetSaveParameters();
 					break;
 
 				case SAVE_TYPE_SAMPLES:
@@ -1771,7 +1771,7 @@ void menu_resetSaveParameters()
 		// return to the state where preset number is selected
 		editModeActive = 1;
 		menu_saveOptions.state	= SAVE_STATE_EDIT_PRESET_NR;//SAVE_STATE_EDIT_TYPE;
-	}		
+	}
 
 	menu_repaintAll();
 
@@ -1836,7 +1836,7 @@ void menu_resetActiveParameter()
 		DISABLE_CONV_WARNING
 		menuIndex &= ~MASK_PARAMETER;
 		END_DISABLE_CONV_WARNING
-	}		
+	}
 };
 //-----------------------------------------------------------------
 uint8_t menu_getSubPage()
@@ -1922,7 +1922,7 @@ void menu_switchPage(uint8_t pageNr)
 		frontPanel_sendData(LED_CC,LED_QUERY_SEQ_TRACK,value);
 		}
 		break;
-	}		
+	}
 
 
 	//re initialize the voice LEDs
@@ -2061,7 +2061,7 @@ void menu_parseGlobalParam(uint16_t paramNr, uint8_t value)
 		} else {
 			//parameterFetch &= ~PARAMETER_LOCK_ACTIVE;
 			parameterFetch = 0;
-		}			
+		}
 		break;
 		/*
 		case PAR_PHASE_VOICE1:
@@ -2243,7 +2243,7 @@ static void menu_processSpecialCaseValues(uint16_t paramNr/*, const uint8_t *val
 	//To see the generated pattern we have to update the step view
 	else if( (paramNr == PAR_EUKLID_LENGTH) || (paramNr == PAR_EUKLID_STEPS) || (paramNr == PAR_EUKLID_ROTATION) )
 	{
-		//query current sequencer step states and light up the corresponding leds 
+		//query current sequencer step states and light up the corresponding leds
 		//frontPanel_sendData(LED_CC,LED_QUERY_SEQ_TRACK,menu_activePage);
 		led_clearSequencerLeds();
 	}
@@ -2319,7 +2319,7 @@ static uint8_t getDtypeValue(uint8_t value, uint16_t paramNr)
 	default:
 		return (uint8_t)(127*frac);
 		break;
-	}	
+	}
 	return 0;
 }
 
@@ -2445,21 +2445,21 @@ void menu_sendAllParameters()
 
 	{
 		//send parameter change to uart tx
-		//since we are sending a big amount of data here we have to be sure 
+		//since we are sending a big amount of data here we have to be sure
 		//that the uart tx buffer doesn't overflow
 		//so we check the return value
 		if(i<128) {
 			frontPanel_sendData(MIDI_CC,(uint8_t)i,parameter_values[i]);
 		} else {
 			frontPanel_sendData(CC_2,(uint8_t)(i-128),parameter_values[i]);
-		}	
+		}
 		//frontPanel_sendData(MIDI_CC,i,parameters[i].value);
 
 		//delay to not overflow the rx buffer on the cortex
 		//TODO ACK scheme for speedup testen
 		if((i&0x1f) == 0x1f) //every 32 steps
 			_delay_ms(1);
-	}		
+	}
 }
 //----------------------------------------------------------------
 uint8_t menu_getActivePage()

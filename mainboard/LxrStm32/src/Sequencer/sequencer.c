@@ -527,16 +527,22 @@ static void seq_nextStep()
 					if(seq_intIsStepActive(i,seq_stepIndex[i],seq_activePattern))
 					{
 						//PROBABILITY
-						//every 8th step a new random value is generated
-						//thus every sub step block has only one random value to compare against
-						//allows randomisation of rolls by chance
-
+						// jt
+						// probability is now handled as a conditional
+						// based on the number of times a pattern repeats.
+						//
+						// If probability is set to 1, the step always triggers.
+						// If probability is set to 4, the step will trigger when
+						// the pattern has repeated four times.
+						/*
 						if((seq_stepIndex[i] & 0x07) == 0x00) //every 8th step
 						{
 							seq_rndValue[i] = GetRngValue()&0x7f;
 						}
+            */
 
-						if( (seq_rndValue[i]) <= seq_patternSet.seq_subStepPattern[seq_activePattern][i][seq_stepIndex[i]].prob )
+						//if( (seq_rndValue[i]) <= seq_patternSet.seq_subStepPattern[seq_activePattern][i][seq_stepIndex[i]].prob )
+						if (seq_barCounter % seq_patternSet.seq_subStepPattern[seq_activePattern][i][seq_stepIndex[i]].prob == 0)
 						{
 							const uint8_t vol = seq_patternSet.seq_subStepPattern[seq_activePattern][i][seq_stepIndex[i]].volume&STEP_VOLUME_MASK;
 							const uint8_t note = seq_patternSet.seq_subStepPattern[seq_activePattern][i][seq_stepIndex[i]].note;
@@ -1185,7 +1191,7 @@ void seq_addNote(uint8_t trackNr,uint8_t vel, uint8_t note)
 		stepPtr=&seq_patternSet.seq_subStepPattern[targetPattern][trackNr][quantizedStep];
 		stepPtr->note 		= note;				// note (--AS was SEQ_DEFAULT_NOTE)
 		stepPtr->volume		= vel;				// new velocity
-		stepPtr->prob		= 127;				// 100% probability
+		stepPtr->prob		= 1;				// 100% probability
 		stepPtr->volume 	|= STEP_ACTIVE_MASK;
 
 		//activate corresponding main step
@@ -1250,7 +1256,7 @@ static void seq_resetNote(Step *step)
 	step->param1Val = 0;
 	step->param2Nr	= NO_AUTOMATION;
 	step->param2Val	= 0;
-	step->prob		= 127;
+	step->prob		= 1;
 	step->volume	= 100; // clears active bit as well
 }
 //------------------------------------------------------------------------------
